@@ -169,6 +169,17 @@ public class LDUser {
     }
 
     /**
+     * Add a {@link java.lang.Boolean}-valued custom attribute
+     * @param k the key for the custom attribute
+     * @param b the value for the custom attribute
+     * @return the builder
+     */
+    public Builder custom(String k, Boolean b) {
+      custom.put(k, new JsonPrimitive(b));
+      return this;
+    }
+
+    /**
      * Add a {@link java.lang.Number}-valued custom attribute
      * @param k the key for the custom attribute
      * @param n the value for the custom attribute
@@ -180,15 +191,15 @@ public class LDUser {
     }
 
     /**
-     * Add a list of {@link java.lang.String}-valued custom attributes
+     * Add a list of custom attributes, which must all be {@link com.google.gson.JsonPrimitive}s
      * @param k the key for the list
      * @param vs the values for the attribute
      * @return the builder
      */
-    public Builder custom(String k, List<String> vs) {
+    public Builder custom(String k, List<JsonPrimitive> vs) {
       JsonArray array = new JsonArray();
-      for (String v : vs) {
-        array.add(new JsonPrimitive(v));
+      for (JsonPrimitive v : vs) {
+        array.add(v);
       }
       custom.put(k, array);
       return this;

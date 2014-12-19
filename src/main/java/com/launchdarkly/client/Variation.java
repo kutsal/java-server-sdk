@@ -3,6 +3,7 @@ package com.launchdarkly.client;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,35 +60,35 @@ class Variation<E> {
   static class TargetRule {
     String attribute;
     String operator;
-    List<String> values;
+    List<JsonElement> values;
 
     private final Logger logger = LoggerFactory.getLogger(TargetRule.class);
 
-    TargetRule(String attribute, String operator, List<String> values) {
+    TargetRule(String attribute, String operator, List<JsonElement> values) {
       this.attribute = attribute;
       this.operator = operator;
-      this.values = new ArrayList<String>(values);
+      this.values = new ArrayList<JsonElement>(values);
     }
 
-    TargetRule(String attribute, List<String> values) {
+    TargetRule(String attribute, List<JsonElement> values) {
       this(attribute, "in", values);
     }
 
     public boolean matchTarget(LDUser user) {
-      String uValue = null;
+      JsonElement uValue = null;
       if (attribute.equals("key")) {
         if (user.getKey() != null) {
-          uValue = user.getKey();
+          uValue = new JsonPrimitive(user.getKey());
         }
       }
       else if (attribute.equals("ip") && user.getIp() != null) {
         if (user.getIp() != null) {
-          uValue = user.getIp();
+          uValue = new JsonPrimitive(user.getIp());
         }
       }
       else if (attribute.equals("country")) {
         if (user.getCountry() != null) {
-          uValue = user.getCountry().getAlpha2();
+          uValue = new JsonPrimitive(user.getCountry().getAlpha2());
         }
       }
       else { // Custom attribute
@@ -101,14 +102,14 @@ class Variation<E> {
                 logger.error("Invalid custom attribute value in user object: " + elt);
                 return false;
               }
-              else if (values.contains(elt.getAsString())) {
+              else if (values.contains(elt)) {
                 return true;
               }
             }
             return false;
           }
           else if (custom.isJsonPrimitive()) {
-            return values.contains(custom.getAsString());
+            return values.contains(custom);
           }
         }
         return false;
@@ -116,7 +117,7 @@ class Variation<E> {
       if (uValue == null) {
         return false;
       }
-      return values.contains((uValue));
+      return values.contains(uValue);
     }
   }
 }
