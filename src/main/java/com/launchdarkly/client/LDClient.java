@@ -12,7 +12,6 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -20,8 +19,6 @@ import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
 
 /**
  * A client for the LaunchDarkly API. Client instances are thread-safe. Applications should instantiate
@@ -31,7 +28,6 @@ import java.util.jar.Manifest;
 public class LDClient implements LDClientInterface {
   private final Logger logger;
   private static final String HMAC_ALGORITHM = "HmacSHA256";
-  protected static final String CLIENT_VERSION = getClientVersion();
 
   private final LDConfig config;
   private final String sdkKey;
@@ -415,27 +411,5 @@ public class LDClient implements LDClientInterface {
       logger.error("Could not generate secure mode hash", e);
     }
     return null;
-  }
-
-  private static String getClientVersion() {
-    Class clazz = LDConfig.class;
-    String className = clazz.getSimpleName() + ".class";
-    String classPath = clazz.getResource(className).toString();
-    if (!classPath.startsWith("jar")) {
-      // Class not from JAR
-      return "Unknown";
-    }
-    String manifestPath = classPath.substring(0, classPath.lastIndexOf("!") + 1) +
-        "/META-INF/MANIFEST.MF";
-    Manifest manifest = null;
-    try {
-      manifest = new Manifest(new URL(manifestPath).openStream());
-      Attributes attr = manifest.getMainAttributes();
-      String value = attr.getValue("Implementation-Version");
-      return value;
-    } catch (IOException e) {
-      logger.warn("Unable to determine LaunchDarkly client library version", e);
-      return "Unknown";
-    }
   }
 }

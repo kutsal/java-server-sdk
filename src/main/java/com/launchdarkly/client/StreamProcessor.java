@@ -8,7 +8,6 @@ import com.launchdarkly.eventsource.MessageEvent;
 import com.launchdarkly.eventsource.ReadyState;
 import okhttp3.Headers;
 
-import org.apache.http.HttpHost;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 
@@ -55,7 +54,7 @@ class StreamProcessor implements UpdateProcessor {
 
     Headers headers = new Headers.Builder()
         .add("Authorization", this.sdkKey)
-        .add("User-Agent", "JavaClient/" + LDClient.CLIENT_VERSION)
+        .add("User-Agent", "JavaClient/" + config.clientVersion)
         .add("Accept", "text/event-stream")
         .build();
 

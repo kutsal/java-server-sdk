@@ -12,7 +12,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * {@link HashMap}
  */
 public class InMemoryFeatureStore implements FeatureStore {
-  private static final Logger logger = LoggerFactory.getLogger(InMemoryFeatureStore.class);
+  private static final Logger logger = LDConfig.getLogger(InMemoryFeatureStore.class);
 
   private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
   private final Map<String, FeatureFlag> features = new HashMap<>();

@@ -10,7 +10,7 @@ final class NewRelicReflector {
 
   private static Method addCustomParameter = null;
 
-  private static final Logger logger = LoggerFactory.getLogger(NewRelicReflector.class);
+  private static final Logger logger = LDConfig.getLogger(NewRelicReflector.class);
 
 
   static {

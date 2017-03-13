@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import java.util.List;
 
 class Clause {
-  private final static Logger logger = LoggerFactory.getLogger(Clause.class);
+  private final static Logger logger = LDConfig.getLogger(Clause.class);
 
   private String attribute;
   private Operator op;

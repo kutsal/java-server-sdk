@@ -21,7 +21,7 @@ class FeatureRequestor {
   private final String sdkKey;
   private final LDConfig config;
   private final CloseableHttpClient client;
-  private static final Logger logger = LoggerFactory.getLogger(FeatureRequestor.class);
+  private static final Logger logger = LDConfig.getLogger(FeatureRequestor.class);
 
   FeatureRequestor(String sdkKey, LDConfig config) {
     this.sdkKey = sdkKey;

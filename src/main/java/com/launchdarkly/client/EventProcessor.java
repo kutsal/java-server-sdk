@@ -56,7 +56,7 @@ class EventProcessor implements Closeable {
   }
 
   class Consumer implements Runnable {
-    private final Logger logger = LoggerFactory.getLogger(Consumer.class);
+    private final Logger logger = LDConfig.getLogger(Consumer.class);
     private final CloseableHttpClient client;
     private final LDConfig config;
 

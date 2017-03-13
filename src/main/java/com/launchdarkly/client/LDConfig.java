@@ -4,9 +4,15 @@ import org.apache.http.HttpHost;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 /**
  * This class exposes advanced configuration options for the {@link LDClient}. Instances of this class must be constructed with a {@link com.launchdarkly.client.LDConfig.Builder}.
@@ -24,7 +30,7 @@ public final class LDConfig implements ILoggerFactory{
   private static final long DEFAULT_START_WAIT_MILLIS = 5000L;
   private static final int DEFAULT_SAMPLING_INTERVAL = 0;
   private static final long DEFAULT_RECONNECT_TIME_MILLIS = 1000;
-  private final ILoggerFactory loggerFactory;
+  private static ILoggerFactory loggerFactory = LoggerFactory.getILoggerFactory();
   private final Logger logger;
 
   protected static final LDConfig DEFAULT = new Builder().build();
@@ -45,10 +51,16 @@ public final class LDConfig implements ILoggerFactory{
   final long startWaitMillis;
   final int samplingInterval;
   final long reconnectTimeMs;
+  final String clientVersion;
+
+  static Logger getLogger(Class<?> klass) {
+    return loggerFactory.getLogger(klass.getName());
+  }
 
   protected LDConfig(Builder builder) {
-    this.loggerFactory = new PerClassLoggerFactory(builder.loggerFactory);
-    this.logger = this.loggerFactory.getLogger(LDConfig.class);
+    loggerFactory = builder.loggerFactory;
+    this.logger = getLogger(LDConfig.class);
+    this.clientVersion = getClientVersion();
 
     this.baseURI = builder.baseURI;
     this.eventsURI = builder.eventsURI;
@@ -72,8 +84,31 @@ public final class LDConfig implements ILoggerFactory{
     this.reconnectTimeMs = builder.reconnectTimeMs;
   }
 
-  public Logger getLogger(Class<?> klass) {
-    return this.getLogger(klass);
+  private String getClientVersion() {
+    Class clazz = LDConfig.class;
+    String className = clazz.getSimpleName() + ".class";
+    String classPath = clazz.getResource(className).toString();
+    if (!classPath.startsWith("jar")) {
+      // Class not from JAR
+      return "Unknown";
+    }
+    String manifestPath = classPath.substring(0, classPath.lastIndexOf("!") + 1) +
+        "/META-INF/MANIFEST.MF";
+    Manifest manifest = null;
+    try {
+      manifest = new Manifest(new URL(manifestPath).openStream());
+      Attributes attr = manifest.getMainAttributes();
+      String value = attr.getValue("Implementation-Version");
+      return value;
+    } catch (IOException e) {
+      logger.warn("Unable to determine LaunchDarkly client library version", e);
+      return "Unknown";
+    }
+  }
+
+  @Override
+  public Logger getLogger(String s) {
+    return null;
   }
 
   /**
@@ -106,7 +141,7 @@ public final class LDConfig implements ILoggerFactory{
     private long startWaitMillis = DEFAULT_START_WAIT_MILLIS;
     private int samplingInterval = DEFAULT_SAMPLING_INTERVAL;
     private long reconnectTimeMs = DEFAULT_RECONNECT_TIME_MILLIS;
-    private ILoggerFactory loggerFactory = LoggerFactory.
+    private ILoggerFactory loggerFactory = LoggerFactory.getILoggerFactory();
 
     /**
      * Creates a builder with all configuration parameters set to the default
@@ -408,7 +443,7 @@ public final class LDConfig implements ILoggerFactory{
     try {
       HttpGet request = new HttpGet(builder.build());
       request.addHeader("Authorization", sdkKey);
-      request.addHeader("User-Agent", "JavaClient/" + LDClient.CLIENT_VERSION);
+      request.addHeader("User-Agent", "JavaClient/" + clientVersion);
 
       return request;
     } catch (Exception e) {
@@ -423,7 +458,7 @@ public final class LDConfig implements ILoggerFactory{
     try {
       HttpPost request = new HttpPost(builder.build());
       request.addHeader("Authorization", sdkKey);
-      request.addHeader("User-Agent", "JavaClient/" + LDClient.CLIENT_VERSION);
+      request.addHeader("User-Agent", "JavaClient/" + clientVersion);
 
       return request;
     } catch (Exception e) {

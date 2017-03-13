@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  *
  */
 public class RedisFeatureStore implements FeatureStore {
-  private static final Logger logger = LoggerFactory.getLogger(RedisFeatureStore.class);
+  private static final Logger logger = LDConfig.getLogger(RedisFeatureStore.class);
   private static final String DEFAULT_PREFIX = "launchdarkly";
   private static final String INIT_KEY = "$initialized$";
   private static final String CACHE_REFRESH_THREAD_POOL_NAME_FORMAT = "RedisFeatureStore-cache-refresher-pool-%d";

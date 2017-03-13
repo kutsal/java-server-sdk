@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  * </pre>
  */
 public class RedisFeatureStoreBuilder {
-    private static final Logger logger = LoggerFactory.getLogger(RedisFeatureStoreBuilder.class);
+    private static final Logger logger = LDConfig.getLogger(RedisFeatureStoreBuilder.class);
     protected boolean refreshStaleValues = false;
     protected boolean asyncRefresh = false;
     protected URI uri;

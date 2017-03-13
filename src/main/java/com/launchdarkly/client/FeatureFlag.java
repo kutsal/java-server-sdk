@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 class FeatureFlag {
-  private final static Logger logger = LoggerFactory.getLogger(FeatureFlag.class);
+  private final static Logger logger = LDConfig.getLogger(FeatureFlag.class);
 
   private static final Gson gson = new Gson();
   private static final Type mapType = new TypeToken<Map<String, FeatureFlag>>() {

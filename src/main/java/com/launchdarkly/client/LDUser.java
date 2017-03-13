@@ -34,7 +34,7 @@ public class LDUser {
   private JsonPrimitive anonymous;
   private JsonPrimitive country;
   private Map<String, JsonElement> custom;
-  private static final Logger logger = LoggerFactory.getLogger(LDUser.class);
+  private static final Logger logger = LDConfig.getLogger(LDUser.class);
 
   protected LDUser(Builder builder) {
     if (builder.key == null || builder.key.equals("")) {
