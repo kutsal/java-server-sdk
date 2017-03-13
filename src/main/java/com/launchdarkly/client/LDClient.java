@@ -7,7 +7,6 @@ import com.google.gson.JsonPrimitive;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.http.annotation.ThreadSafe;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -30,7 +29,7 @@ import java.util.jar.Manifest;
  */
 @ThreadSafe
 public class LDClient implements LDClientInterface {
-  private static final Logger logger = LoggerFactory.getLogger(LDClient.class);
+  private final Logger logger;
   private static final String HMAC_ALGORITHM = "HmacSHA256";
   protected static final String CLIENT_VERSION = getClientVersion();
 
@@ -58,6 +57,7 @@ public class LDClient implements LDClientInterface {
    * @param config a client configuration object
    */
   public LDClient(String sdkKey, LDConfig config) {
+    this.logger = config.getLogger(LDClient.class);
     this.config = config;
     this.sdkKey = sdkKey;
     this.requestor = createFeatureRequestor(sdkKey, config);
@@ -344,7 +344,7 @@ public class LDClient implements LDClientInterface {
     try {
       FeatureFlag featureFlag = config.featureStore.get(featureKey);
       if (featureFlag == null) {
-        logger.warn("Unknown feature flag " + featureKey + "; returning default value");
+        logger.debug("Unknown feature flag " + featureKey + "; returning default value");
         sendFlagRequestEvent(featureKey, user, defaultValue, defaultValue, null);
         return defaultValue;
       }

@@ -5,7 +5,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 
@@ -13,7 +12,7 @@ import java.net.URI;
  * This class exposes advanced configuration options for the {@link LDClient}. Instances of this class must be constructed with a {@link com.launchdarkly.client.LDConfig.Builder}.
  *
  */
-public final class LDConfig {
+public final class LDConfig implements ILoggerFactory{
   private static final URI DEFAULT_BASE_URI = URI.create("https://app.launchdarkly.com");
   private static final URI DEFAULT_EVENTS_URI = URI.create("https://events.launchdarkly.com");
   private static final URI DEFAULT_STREAM_URI = URI.create("https://stream.launchdarkly.com");
@@ -25,7 +24,8 @@ public final class LDConfig {
   private static final long DEFAULT_START_WAIT_MILLIS = 5000L;
   private static final int DEFAULT_SAMPLING_INTERVAL = 0;
   private static final long DEFAULT_RECONNECT_TIME_MILLIS = 1000;
-  private static final Logger logger = LoggerFactory.getLogger(LDConfig.class);
+  private final ILoggerFactory loggerFactory;
+  private final Logger logger;
 
   protected static final LDConfig DEFAULT = new Builder().build();
 
@@ -47,6 +47,9 @@ public final class LDConfig {
   final long reconnectTimeMs;
 
   protected LDConfig(Builder builder) {
+    this.loggerFactory = new PerClassLoggerFactory(builder.loggerFactory);
+    this.logger = this.loggerFactory.getLogger(LDConfig.class);
+
     this.baseURI = builder.baseURI;
     this.eventsURI = builder.eventsURI;
     this.capacity = builder.capacity;
@@ -67,6 +70,10 @@ public final class LDConfig {
     this.startWaitMillis = builder.startWaitMillis;
     this.samplingInterval = builder.samplingInterval;
     this.reconnectTimeMs = builder.reconnectTimeMs;
+  }
+
+  public Logger getLogger(Class<?> klass) {
+    return this.getLogger(klass);
   }
 
   /**
@@ -99,6 +106,7 @@ public final class LDConfig {
     private long startWaitMillis = DEFAULT_START_WAIT_MILLIS;
     private int samplingInterval = DEFAULT_SAMPLING_INTERVAL;
     private long reconnectTimeMs = DEFAULT_RECONNECT_TIME_MILLIS;
+    private ILoggerFactory loggerFactory = LoggerFactory.
 
     /**
      * Creates a builder with all configuration parameters set to the default
